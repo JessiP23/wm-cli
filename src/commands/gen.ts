@@ -7,7 +7,7 @@
  */
 import type { Command } from "commander"
 import ora from "ora"
-import { makeCtx, requireAuth, renderResult, confirmCost, renderCreditsFooter } from "./_shared.js"
+import { makeCtx, requireAuth, renderResult, confirmCost, renderCreditsFooter, promptAspectRatio } from "./_shared.js"
 import { DEFAULT_MODELS } from "../constants.js"
 import { downloadToFile } from "../util/download.js"
 import { awaitJob } from "../util/await-job.js"
@@ -54,6 +54,9 @@ export function registerGen(program: Command): void {
       const ctx = makeCtx(program)
       requireAuth(ctx)
 
+      // Prompt for aspect ratio when not passed via --aspect-ratio.
+      const aspectRatio = await promptAspectRatio(opts.aspectRatio, ctx.json)
+
       // Pick edit variant for img2img when no explicit model was given.
       const model = opts.model ?? (opts.imageUrl ? DEFAULT_MODELS.imageEdit : DEFAULT_MODELS.image)
       const numImages = opts.numImages ? Number(opts.numImages) : undefined
@@ -63,7 +66,7 @@ export function registerGen(program: Command): void {
         Boolean(opts.yes),
         {
           model,
-          aspect_ratio: opts.aspectRatio,
+          aspect_ratio: aspectRatio,
           num_images: numImages,
         },
         `Image generation · ${model}`
@@ -82,7 +85,7 @@ export function registerGen(program: Command): void {
             prompt,
             model,
             image_url: opts.imageUrl,
-            aspect_ratio: opts.aspectRatio,
+            aspect_ratio: aspectRatio,
             negative_prompt: opts.negativePrompt,
             num_images: numImages,
             seed: opts.seed ? Number(opts.seed) : undefined,
@@ -108,12 +111,15 @@ export function registerGen(program: Command): void {
     .option("-m, --model <id>", "Provider/model id (auto-picks i2v vs t2v based on --image).")
     .option("-i, --image <url>", "Starting frame for image-to-video")
     .option("-d, --duration <seconds>", "Clip length", "5")
-    .option("-a, --aspect-ratio <ratio>", "16:9 | 9:16 | 1:1", "16:9")
+    .option("-a, --aspect-ratio <ratio>", "16:9 | 9:16 | 1:1 | 4:3 | 3:4 | 21:9")
     .option("-o, --out <file>", "Download the final clip to this path")
     .option("-y, --yes", "Skip the cost confirmation prompt", false)
     .action(async (prompt: string, opts: VideoOpts) => {
       const ctx = makeCtx(program)
       requireAuth(ctx)
+
+      const aspectRatio = await promptAspectRatio(opts.aspectRatio, ctx.json)
+
       const model =
         opts.model ?? (opts.image ? DEFAULT_MODELS.videoImage : DEFAULT_MODELS.videoText)
       const duration = Number(opts.duration)
@@ -124,7 +130,7 @@ export function registerGen(program: Command): void {
         {
           model,
           duration,
-          aspect_ratio: opts.aspectRatio,
+          aspect_ratio: aspectRatio,
         },
         `Video generation · ${model} · ${duration}s`
       )
@@ -143,7 +149,7 @@ export function registerGen(program: Command): void {
             model,
             image_url: opts.image,
             duration,
-            aspect_ratio: opts.aspectRatio,
+            aspect_ratio: aspectRatio,
           },
         })
         if (spinner) spinner.text = "Rendering video…"

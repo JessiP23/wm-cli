@@ -46,3 +46,21 @@ export const DEFAULT_MODELS = {
   casting: "fal-ai/nano-banana-pro",
   ugcRoom: "fal-ai/nano-banana-pro",
 } as const
+
+/**
+ * Aspect-ratio options for image generation.
+ * Single source of truth — keep in sync with
+ * `mcp-director` `studio://options/image-aspect-ratios` resource.
+ *
+ * To add a new ratio, append an entry here and to the MCP resource.
+ * The CLI picker and MCP agent instructions both read from their
+ * respective lists automatically.
+ */
+export const ASPECT_RATIOS = [
+  { value: "1:1", label: "Square (1:1)" },
+  { value: "16:9", label: "Landscape (16:9)" },
+  { value: "9:16", label: "Portrait (9:16)" },
+  { value: "4:3", label: "Classic (4:3)" },
+  { value: "3:4", label: "Tall (3:4)" },
+  { value: "21:9", label: "Ultrawide (21:9)" },
+] as const

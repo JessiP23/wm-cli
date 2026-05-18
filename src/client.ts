@@ -47,7 +47,7 @@ export class WmApiClient {
   estimatePricing(body: {
     model: string
     [key: string]: unknown
-  }): Promise<{ credits: number; costUSD: number; costEUR: number }> {
+  }): Promise<{ credits: number }> {
     return this.json({ method: "POST", path: "/creative-studio/pricing", body })
   }
 

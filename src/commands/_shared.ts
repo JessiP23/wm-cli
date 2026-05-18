@@ -2,12 +2,13 @@
  * Shared command helpers: resolve config, build client, render output.
  */
 import type { Command } from "commander"
-import { confirm } from "@inquirer/prompts"
+import { confirm, select } from "@inquirer/prompts"
 import kleur from "kleur"
 import { resolveConfig, type ResolvedConfig } from "../config.js"
 import { WmApiClient } from "../client.js"
 import { logger } from "../logger.js"
 import { WmCliError } from "../errors.js"
+import { ASPECT_RATIOS } from "../constants.js"
 
 export interface GlobalFlags {
   apiUrl?: string
@@ -63,12 +64,10 @@ export async function confirmCost(
   body: { model: string; [key: string]: unknown },
   summary: string
 ): Promise<boolean> {
-  // --json mode + --yes flag both skip the interactive prompt.
-  // We ALWAYS still fetch the estimate so the JSON output can include it.
-  let estimate: { credits: number; costUSD: number } | null = null
+  let credits: number | null = null
   try {
     const res = await ctx.client.estimatePricing(body)
-    estimate = { credits: res.credits, costUSD: res.costUSD }
+    credits = res.credits
   } catch (err) {
     if (!ctx.json) {
       logger.warn(
@@ -79,26 +78,20 @@ export async function confirmCost(
   }
 
   if (ctx.json || skipPrompt) {
-    if (estimate && !ctx.json) {
-      logger.info(
-        `${summary} — estimated ${kleur.yellow(`${estimate.credits} credits`)} ` +
-          `(~$${estimate.costUSD.toFixed(3)})`
-      )
+    if (credits !== null && !ctx.json) {
+      logger.info(`${summary} — estimated ${kleur.yellow(`${credits} credits`)}`)
     }
     return true
   }
 
-  if (!estimate) {
-    // No estimate available — prompt without a number.
+  if (credits === null) {
     return confirm({
       message: `${summary}. Cost unknown. Proceed anyway?`,
       default: false,
     })
   }
 
-  const msg =
-    `${summary}\n  Estimated cost: ${kleur.yellow(`${estimate.credits} credits`)} ` +
-    `(~$${estimate.costUSD.toFixed(3)})\n  Proceed?`
+  const msg = `${summary}\n  Estimated cost: ${kleur.yellow(`${credits} credits`)}\n  Proceed?`
   return confirm({ message: msg, default: true })
 }
 
@@ -112,4 +105,29 @@ export function renderCreditsFooter(ctx: CommandCtx, payload: unknown): void {
   if (typeof obj.creditsRemaining === "number") {
     logger.info(`${charged}${obj.creditsRemaining} credits remaining`)
   }
+}
+
+/**
+ * Prompt the user for an aspect ratio when none was provided via CLI flag.
+ *
+ * Extensible: when more image params are added in the future (e.g. style
+ * presets, output format), add them as separate prompt functions following
+ * the same pattern — each reads from a shared constant list and only fires
+ * when the corresponding CLI flag is absent.
+ *
+ * @param cliValue  value from --aspect-ratio (may be undefined)
+ * @param jsonMode  when true, skip interactive prompts entirely
+ * @returns the resolved aspect ratio string (e.g. "16:9")
+ */
+export async function promptAspectRatio(
+  cliValue: string | undefined,
+  jsonMode: boolean
+): Promise<string> {
+  if (cliValue) return cliValue
+  if (jsonMode) return "1:1" // non-interactive mode: pick the default
+  return select({
+    message: "Choose aspect ratio:",
+    choices: ASPECT_RATIOS.map((r) => ({ name: r.label, value: r.value })),
+    default: "1:1",
+  })
 }
