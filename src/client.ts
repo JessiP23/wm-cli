@@ -94,13 +94,18 @@ export class WmApiClient {
       clearTimeout(timeout)
       if (err instanceof WmCliError) throw err
       const aborted = (err as { name?: string } | null)?.name === "AbortError"
+      // undici wraps the real reason (ENOTFOUND, ECONNREFUSED, certificate, etc.)
+      // inside `.cause`. Surfacing it makes "fetch failed" actually debuggable.
+      const e = err as Error & { cause?: { code?: string; message?: string } }
+      const cause = e?.cause
+      const causeMsg = cause?.code ?? cause?.message
       throw new WmCliError({
         code: aborted ? "timeout" : "network",
         exitCode: aborted ? ExitCode.TIMEOUT : ExitCode.NETWORK,
         message: aborted
-          ? `Request timed out after ${timeoutMs}ms (${req.method} ${req.path})`
-          : `Network error: ${(err as Error).message}`,
-        details: { cause: (err as Error).message },
+          ? `Request timed out after ${timeoutMs}ms (${req.method} ${url.toString()})`
+          : `Network error: ${e.message}${causeMsg ? ` (${causeMsg})` : ""} — ${req.method} ${url.toString()}`,
+        details: { cause: causeMsg ?? e.message, url: url.toString() },
       })
     }
     clearTimeout(timeout)
