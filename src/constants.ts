@@ -34,14 +34,15 @@ export const ENV = {
 
 /** Default model ids per tool — mirror `mcp-director/src/tools/studio.py` defaults. */
 export const DEFAULT_MODELS = {
-  image: "fal-ai/flux/dev",
-  videoText: "fal-ai/kling-video/v2.5-turbo/pro/text-to-video",
-  videoImage: "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
+  image: "fal-ai/nano-banana-pro",
+  imageEdit: "fal-ai/nano-banana-pro/edit",
+  videoText: "bytedance/seedance-2.0-fast",
+  videoImage: "bytedance/seedance-2.0-fast",
   upscaleImage: "fal-ai/topaz/upscale/image",
   upscaleVideo: "fal-ai/topaz/upscale/video",
   threeD: "fal-ai/meshy/v6/image-to-3d",
-  brandshot: "fal-ai/flux/dev",
-  cameraAngles: "fal-ai/flux/dev",
-  casting: "fal-ai/flux/dev",
-  ugcRoom: "fal-ai/flux/dev",
+  brandshot: "fal-ai/nano-banana-pro",
+  cameraAngles: "fal-ai/nano-banana-pro",
+  casting: "fal-ai/nano-banana-pro",
+  ugcRoom: "fal-ai/nano-banana-pro",
 } as const

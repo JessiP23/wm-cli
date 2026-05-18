@@ -40,6 +40,17 @@ export class WmApiClient {
     return this.json({ method: "GET", path: "/me" })
   }
 
+  /**
+   * Estimate the credit cost of a generation BEFORE running it.
+   * Hits POST /creative-studio/pricing.
+   */
+  estimatePricing(body: {
+    model: string
+    [key: string]: unknown
+  }): Promise<{ credits: number; costUSD: number; costEUR: number }> {
+    return this.json({ method: "POST", path: "/creative-studio/pricing", body })
+  }
+
   /** Validate the current api key without side-effects. */
   async ping(): Promise<boolean> {
     try {

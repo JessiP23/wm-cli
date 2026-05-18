@@ -7,10 +7,11 @@
  */
 import type { Command } from "commander"
 import ora from "ora"
-import { makeCtx, requireAuth, renderResult } from "./_shared.js"
+import { makeCtx, requireAuth, renderResult, confirmCost, renderCreditsFooter } from "./_shared.js"
 import { DEFAULT_MODELS } from "../constants.js"
 import { downloadToFile } from "../util/download.js"
 import { awaitJob } from "../util/await-job.js"
+import { logger } from "../logger.js"
 
 interface ImageOpts {
   model?: string
@@ -20,6 +21,7 @@ interface ImageOpts {
   numImages?: string
   seed?: string
   out?: string
+  yes?: boolean
 }
 
 interface VideoOpts {
@@ -28,6 +30,7 @@ interface VideoOpts {
   duration?: string
   aspectRatio?: string
   out?: string
+  yes?: boolean
 }
 
 export function registerGen(program: Command): void {
@@ -36,16 +39,40 @@ export function registerGen(program: Command): void {
   gen
     .command("image <prompt>")
     .description("Text-to-image or image-to-image generation.")
-    .option("-m, --model <id>", "Provider/model id", DEFAULT_MODELS.image)
+    .option(
+      "-m, --model <id>",
+      "Provider/model id (auto-picks edit variant when --image-url is passed)"
+    )
     .option("-i, --image-url <url>", "Reference image URL for img2img variants")
     .option("-a, --aspect-ratio <ratio>", "1:1 | 16:9 | 9:16 | 4:3 | 3:4")
     .option("-n, --negative-prompt <text>", "Negative prompt")
     .option("--num-images <n>", "Batch size", "1")
     .option("--seed <n>", "Deterministic seed")
     .option("-o, --out <file>", "Download the result to this path")
+    .option("-y, --yes", "Skip the cost confirmation prompt", false)
     .action(async (prompt: string, opts: ImageOpts) => {
       const ctx = makeCtx(program)
       requireAuth(ctx)
+
+      // Pick edit variant for img2img when no explicit model was given.
+      const model = opts.model ?? (opts.imageUrl ? DEFAULT_MODELS.imageEdit : DEFAULT_MODELS.image)
+      const numImages = opts.numImages ? Number(opts.numImages) : undefined
+
+      const ok = await confirmCost(
+        ctx,
+        Boolean(opts.yes),
+        {
+          model,
+          aspect_ratio: opts.aspectRatio,
+          num_images: numImages,
+        },
+        `Image generation · ${model}`
+      )
+      if (!ok) {
+        logger.info("Cancelled.")
+        return
+      }
+
       const spinner = ctx.json ? null : ora("Generating image…").start()
       try {
         const submit = await ctx.client.json<Record<string, unknown>>({
@@ -53,11 +80,11 @@ export function registerGen(program: Command): void {
           path: "/studio/generate-image",
           body: {
             prompt,
-            model: opts.model,
+            model,
             image_url: opts.imageUrl,
             aspect_ratio: opts.aspectRatio,
             negative_prompt: opts.negativePrompt,
-            num_images: opts.numImages ? Number(opts.numImages) : undefined,
+            num_images: numImages,
             seed: opts.seed ? Number(opts.seed) : undefined,
           },
         })
@@ -68,6 +95,7 @@ export function registerGen(program: Command): void {
         spinner?.succeed("Image ready.")
         if (opts.out && result.imageUrl) await downloadToFile(result.imageUrl, opts.out)
         renderResult(ctx, result, `→ ${result.imageUrl}`)
+        renderCreditsFooter(ctx, result)
       } catch (e) {
         spinner?.fail("Image generation failed.")
         throw e
@@ -82,11 +110,29 @@ export function registerGen(program: Command): void {
     .option("-d, --duration <seconds>", "Clip length", "5")
     .option("-a, --aspect-ratio <ratio>", "16:9 | 9:16 | 1:1", "16:9")
     .option("-o, --out <file>", "Download the final clip to this path")
+    .option("-y, --yes", "Skip the cost confirmation prompt", false)
     .action(async (prompt: string, opts: VideoOpts) => {
       const ctx = makeCtx(program)
       requireAuth(ctx)
       const model =
         opts.model ?? (opts.image ? DEFAULT_MODELS.videoImage : DEFAULT_MODELS.videoText)
+      const duration = Number(opts.duration)
+
+      const ok = await confirmCost(
+        ctx,
+        Boolean(opts.yes),
+        {
+          model,
+          duration,
+          aspect_ratio: opts.aspectRatio,
+        },
+        `Video generation · ${model} · ${duration}s`
+      )
+      if (!ok) {
+        logger.info("Cancelled.")
+        return
+      }
+
       const spinner = ctx.json ? null : ora("Submitting video job…").start()
       try {
         const submit = await ctx.client.json<Record<string, unknown>>({
@@ -96,7 +142,7 @@ export function registerGen(program: Command): void {
             prompt,
             model,
             image_url: opts.image,
-            duration: Number(opts.duration),
+            duration,
             aspect_ratio: opts.aspectRatio,
           },
         })
@@ -107,6 +153,7 @@ export function registerGen(program: Command): void {
         spinner?.succeed("Video ready.")
         if (opts.out && final.videoUrl) await downloadToFile(final.videoUrl, opts.out)
         renderResult(ctx, final, `→ ${final.videoUrl}`)
+        renderCreditsFooter(ctx, final)
       } catch (e) {
         spinner?.fail("Video generation failed.")
         throw e

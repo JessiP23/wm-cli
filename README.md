@@ -79,6 +79,33 @@ WM_API_KEY=wm_live_xxx wm whoami
 
 Run `wm <command> --help` for full flags.
 
+## Cost confirmation
+
+Every generation command (`gen image`, `gen video`, `upscale`) shows you the estimated credit cost and asks you to confirm before charging:
+
+```
+? Image generation · fal-ai/nano-banana-pro
+  Estimated cost: 18 credits (~$0.300)
+  Proceed? (Y/n)
+```
+
+After the generation completes you also see how many credits you have left. Skip the prompt with `-y/--yes` for unattended/CI use:
+
+```bash
+wm gen image "red apple" --yes -o apple.png
+wm --json gen image "red apple"           # --json also auto-skips the prompt
+```
+
+Defaults are tuned for current best-in-class quality:
+
+| Tool | Default model |
+|---|---|
+| `gen image` (text-to-image) | `fal-ai/nano-banana-pro` |
+| `gen image --image-url ...` | `fal-ai/nano-banana-pro/edit` (auto-picked) |
+| `gen video` | `bytedance/seedance-2.0-fast` |
+
+Override with `-m/--model` whenever you want.
+
 ## Examples
 
 ```bash
