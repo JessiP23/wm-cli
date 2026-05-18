@@ -181,3 +181,17 @@ git push -u origin main
 
 Nothing in this scaffold references its on-disk parent directory, so the move
 is purely a `mv` + `git init`.
+
+
+## Commands
+```bash
+cd ~/wm/wm-cli
+nvm use && corepack enable
+pnpm install
+pnpm typecheck   # ❶ resolves every "Cannot find module" lint
+pnpm lint        # ❷ rules pass
+pnpm test        # ❸ vitest: config + client (msw) unit tests go green
+pnpm build       # ❹ single ESM bundle in dist/index.js
+node dist/index.js --help   # ❺ commander prints the usage
+node dist/index.js --version
+```
