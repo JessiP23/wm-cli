@@ -85,7 +85,7 @@ Every generation command (`gen image`, `gen video`, `upscale`) shows you the est
 
 ```
 ? Image generation · fal-ai/nano-banana-pro
-  Estimated cost: 18 credits (~$0.300)
+  Estimated cost: 18 credits
   Proceed? (Y/n)
 ```
 
