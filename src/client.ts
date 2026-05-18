@@ -44,10 +44,7 @@ export class WmApiClient {
    * Estimate the credit cost of a generation BEFORE running it.
    * Hits POST /creative-studio/pricing.
    */
-  estimatePricing(body: {
-    model: string
-    [key: string]: unknown
-  }): Promise<{ credits: number }> {
+  estimatePricing(body: { model: string; [key: string]: unknown }): Promise<{ credits: number }> {
     return this.json({ method: "POST", path: "/creative-studio/pricing", body })
   }
 

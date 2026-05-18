@@ -7,7 +7,14 @@
  */
 import type { Command } from "commander"
 import ora from "ora"
-import { makeCtx, requireAuth, renderResult, confirmCost, renderCreditsFooter, promptAspectRatio } from "./_shared.js"
+import {
+  makeCtx,
+  requireAuth,
+  renderResult,
+  confirmCost,
+  renderCreditsFooter,
+  promptAspectRatio,
+} from "./_shared.js"
 import { DEFAULT_MODELS } from "../constants.js"
 import { downloadToFile } from "../util/download.js"
 import { awaitJob } from "../util/await-job.js"
