@@ -73,6 +73,7 @@ WM_API_KEY=wm_live_xxx wm whoami
 | `wm gen video <prompt>` | Generate a video |
 | `wm upscale <image>` | Upscale an image (URL or local file) |
 | `wm campaign <brief>` | Run a multi-asset brand campaign |
+| `wm search <query>` | Web search (Tavily-powered) — 1 credit basic, 2 advanced |
 | `wm jobs list` | List your recent generation jobs |
 | `wm jobs get <id>` | Show details for a single job |
 
@@ -95,6 +96,19 @@ wm upscale ./photo.jpg --scale 4 --out ./upscaled/
 # Brand campaign from a single brief
 wm campaign "Launch teaser for an artisanal coffee brand called Brava" \
   --out ./campaigns/brava/
+
+# Web search — quick lookup
+wm search "next.js 16 release notes"
+
+# Web search — advanced, last week, restricted sources
+wm search "OpenAI o3 benchmarks" \
+  --depth advanced \
+  --time week \
+  --max 10 \
+  --include-domain wikipedia.org
+
+# Pipe URLs into another tool
+wm --json search "vector databases" | jq -r '.results[].url'
 
 # Inspect jobs
 wm jobs list --limit 10

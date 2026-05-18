@@ -8,6 +8,7 @@ import { registerGen } from "./commands/gen.js"
 import { registerUpscale } from "./commands/upscale.js"
 import { registerCampaign } from "./commands/campaign.js"
 import { registerJobs } from "./commands/jobs.js"
+import { registerSearch } from "./commands/search.js"
 
 export async function run(argv: string[]): Promise<void> {
   const program = new Command()
@@ -27,6 +28,7 @@ export async function run(argv: string[]): Promise<void> {
   registerUpscale(program)
   registerCampaign(program)
   registerJobs(program)
+  registerSearch(program)
 
   await program.parseAsync(argv)
 }
