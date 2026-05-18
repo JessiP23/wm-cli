@@ -86,10 +86,9 @@ export class WmApiClient {
       throw new WmCliError({
         code: aborted ? "timeout" : "network",
         exitCode: aborted ? ExitCode.TIMEOUT : ExitCode.NETWORK,
-        message:
-          aborted
-            ? `Request timed out after ${timeoutMs}ms (${req.method} ${req.path})`
-            : `Network error: ${(err as Error).message}`,
+        message: aborted
+          ? `Request timed out after ${timeoutMs}ms (${req.method} ${req.path})`
+          : `Network error: ${(err as Error).message}`,
         details: { cause: (err as Error).message },
       })
     }

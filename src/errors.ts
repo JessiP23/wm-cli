@@ -87,9 +87,7 @@ export class WmCliError extends Error {
     return new WmCliError({
       code: ErrorCode.UpgradeRequired,
       exitCode: ExitCode.UPGRADE_REQUIRED,
-      message:
-        message ??
-        `Insufficient credits. Top up at ${upgradeUrl} and re-run.`,
+      message: message ?? `Insufficient credits. Top up at ${upgradeUrl} and re-run.`,
       details: { upgradeUrl },
     })
   }

@@ -81,8 +81,7 @@ export interface ConfigOverrides {
 export function resolveConfig(overrides: ConfigOverrides = {}): ResolvedConfig {
   const file = readFileConfig()
   return {
-    apiUrl:
-      overrides.apiUrl ?? process.env[ENV.ApiUrl] ?? file.apiUrl ?? DEFAULTS.apiUrl,
+    apiUrl: overrides.apiUrl ?? process.env[ENV.ApiUrl] ?? file.apiUrl ?? DEFAULTS.apiUrl,
     apiKey: overrides.apiKey ?? process.env[ENV.ApiKey] ?? file.apiKey,
     uploadUrl: process.env[ENV.UploadUrl] ?? file.uploadUrl ?? DEFAULTS.uploadUrl,
     upgradeUrl: process.env[ENV.UpgradeUrl] ?? file.upgradeUrl ?? DEFAULTS.upgradeUrl,

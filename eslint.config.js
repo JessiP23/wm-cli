@@ -18,7 +18,10 @@ export default tseslint.config(
     rules: {
       // Match wmstudio house style
       "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports" }],
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }],
       "no-console": "off", // CLI legitimately uses console

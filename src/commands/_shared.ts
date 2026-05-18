@@ -27,7 +27,9 @@ export function makeCtx(program: Command): CommandCtx {
   return { cfg, client: new WmApiClient(cfg), json: Boolean(opts.json) }
 }
 
-export function requireAuth(ctx: CommandCtx): asserts ctx is CommandCtx & { cfg: ResolvedConfig & { apiKey: string } } {
+export function requireAuth(
+  ctx: CommandCtx
+): asserts ctx is CommandCtx & { cfg: ResolvedConfig & { apiKey: string } } {
   if (!ctx.cfg.apiKey) throw WmCliError.authRequired()
 }
 

@@ -42,7 +42,7 @@ export async function awaitJob(
   client: WmApiClient,
   submit: SubmitResponse,
   asset: Asset,
-  onTick?: (s: JobStatus) => void,
+  onTick?: (s: JobStatus) => void
 ): Promise<AwaitedJob> {
   // Sync response: URL already present.
   if (!submit.queued) {

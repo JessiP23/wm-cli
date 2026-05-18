@@ -31,9 +31,7 @@ interface VideoOpts {
 }
 
 export function registerGen(program: Command): void {
-  const gen = program
-    .command("gen")
-    .description("Generate creative assets (image, video).")
+  const gen = program.command("gen").description("Generate creative assets (image, video).")
 
   gen
     .command("image <prompt>")
@@ -87,7 +85,8 @@ export function registerGen(program: Command): void {
     .action(async (prompt: string, opts: VideoOpts) => {
       const ctx = makeCtx(program)
       requireAuth(ctx)
-      const model = opts.model ?? (opts.image ? DEFAULT_MODELS.videoImage : DEFAULT_MODELS.videoText)
+      const model =
+        opts.model ?? (opts.image ? DEFAULT_MODELS.videoImage : DEFAULT_MODELS.videoText)
       const spinner = ctx.json ? null : ora("Submitting video job…").start()
       try {
         const submit = await ctx.client.json<Record<string, unknown>>({

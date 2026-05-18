@@ -21,7 +21,11 @@ const server = setupServer(
   }),
   http.post(`${API}/studio/upscale-image`, () =>
     HttpResponse.json(
-      { error: "Not enough credits", requiresTopUp: true, upgradeUrl: "https://wmstudio.io/billing" },
+      {
+        error: "Not enough credits",
+        requiresTopUp: true,
+        upgradeUrl: "https://wmstudio.io/billing",
+      },
       { status: 402 }
     )
   ),

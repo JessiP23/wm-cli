@@ -34,4 +34,6 @@ export async function run(argv: string[]): Promise<void> {
 // Injected at build time by tsup via `define` — fallback for `tsx`/`vitest`.
 declare const __VERSION__: string | undefined
 const VERSION: string =
-  (typeof __VERSION__ !== "undefined" && __VERSION__) || process.env.npm_package_version || "0.0.0-dev"
+  (typeof __VERSION__ !== "undefined" && __VERSION__) ||
+  process.env.npm_package_version ||
+  "0.0.0-dev"
