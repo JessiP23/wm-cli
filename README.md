@@ -195,3 +195,37 @@ pnpm build       # ❹ single ESM bundle in dist/index.js
 node dist/index.js --help   # ❺ commander prints the usage
 node dist/index.js --version
 ```
+
+
+
+## Commands to run for pushing. anew version
+```bash
+cd ~/wm/wm-cli
+git commit -am "feat: <whatever>"   # your code change
+pnpm changeset                       # pick patch/minor/major + summary
+pnpm changeset version               # bumps version + CHANGELOG
+git commit -am "chore: release"
+pnpm publish --access public
+```
+
+
+## Commands for testing on my machine the deployed
+```bash
+# Install once, anywhere on macOS / Linux / Windows
+npm i -g @jessip2323/wm-cli
+
+# Confirm
+wm --version
+
+# Get an API key from your dashboard
+open https://wmstudio.io/en/dashboard/api-keys
+# (or http://localhost:3000/en/dashboard/api-keys for local)
+
+# Log in
+wm login                # paste the sk_live_... token
+
+# First call
+wm whoami
+wm gen image "a single red apple" -o apple.png
+file apple.png          # → PNG image data
+```

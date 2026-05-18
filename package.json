@@ -1,6 +1,6 @@
 {
-  "name": "@jessip2323/wm-cli",
-  "version": "0.2.1",
+  "name": "wmstudio-cli",
+  "version": "0.2.2",
   "description": "Command-line client for the WM Studio creative platform. Generates images, videos, brand campaigns, and 3D assets from your terminal.",
   "type": "module",
   "bin": {

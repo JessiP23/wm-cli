@@ -1,5 +1,11 @@
 # @wmstudio/cli
 
+## 0.2.2
+
+### Patch Changes
+
+- Rename package to wmstudio-cli
+
 ## 0.2.1
 
 ### Patch Changes
