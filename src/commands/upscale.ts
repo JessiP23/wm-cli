@@ -2,6 +2,7 @@ import type { Command } from "commander"
 import ora from "ora"
 import { makeCtx, requireAuth, renderResult } from "./_shared.js"
 import { downloadToFile } from "../util/download.js"
+import { awaitJob } from "../util/await-job.js"
 
 interface UpscaleOpts {
   factor?: string
@@ -23,7 +24,7 @@ export function registerUpscale(program: Command): void {
       requireAuth(ctx)
       const spinner = ctx.json ? null : ora("Upscaling…").start()
       try {
-        const result = await ctx.client.json<{ imageUrl: string; creditsRemaining: number }>({
+        const submit = await ctx.client.json<Record<string, unknown>>({
           method: "POST",
           path: "/studio/upscale-image",
           body: {
@@ -33,8 +34,11 @@ export function registerUpscale(program: Command): void {
             face_enhancement: opts.faceEnhancement,
           },
         })
+        const result = await awaitJob(ctx.client, submit, "image", (s) => {
+          if (spinner) spinner.text = `Upscale · ${s.status}`
+        })
         spinner?.succeed("Upscaled.")
-        if (opts.out) await downloadToFile(result.imageUrl, opts.out)
+        if (opts.out && result.imageUrl) await downloadToFile(result.imageUrl, opts.out)
         renderResult(ctx, result, `→ ${result.imageUrl}`)
       } catch (e) {
         spinner?.fail("Upscale failed.")

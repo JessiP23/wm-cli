@@ -10,7 +10,7 @@ import ora from "ora"
 import { makeCtx, requireAuth, renderResult } from "./_shared.js"
 import { DEFAULT_MODELS } from "../constants.js"
 import { downloadToFile } from "../util/download.js"
-import { poll } from "../util/poll.js"
+import { awaitJob } from "../util/await-job.js"
 
 interface ImageOpts {
   model?: string
@@ -50,7 +50,7 @@ export function registerGen(program: Command): void {
       requireAuth(ctx)
       const spinner = ctx.json ? null : ora("Generating image…").start()
       try {
-        const result = await ctx.client.json<{ imageUrl: string; creditsRemaining: number }>({
+        const submit = await ctx.client.json<Record<string, unknown>>({
           method: "POST",
           path: "/studio/generate-image",
           body: {
@@ -63,8 +63,12 @@ export function registerGen(program: Command): void {
             seed: opts.seed ? Number(opts.seed) : undefined,
           },
         })
+        if (spinner) spinner.text = "Rendering image…"
+        const result = await awaitJob(ctx.client, submit, "image", (s) => {
+          if (spinner) spinner.text = `Image · ${s.status}`
+        })
         spinner?.succeed("Image ready.")
-        if (opts.out) await downloadToFile(result.imageUrl, opts.out)
+        if (opts.out && result.imageUrl) await downloadToFile(result.imageUrl, opts.out)
         renderResult(ctx, result, `→ ${result.imageUrl}`)
       } catch (e) {
         spinner?.fail("Image generation failed.")
@@ -86,7 +90,7 @@ export function registerGen(program: Command): void {
       const model = opts.model ?? (opts.image ? DEFAULT_MODELS.videoImage : DEFAULT_MODELS.videoText)
       const spinner = ctx.json ? null : ora("Submitting video job…").start()
       try {
-        const submit = await ctx.client.json<{ jobId: string }>({
+        const submit = await ctx.client.json<Record<string, unknown>>({
           method: "POST",
           path: "/studio/generate-video",
           body: {
@@ -97,28 +101,12 @@ export function registerGen(program: Command): void {
             aspect_ratio: opts.aspectRatio,
           },
         })
-        if (spinner) spinner.text = `Job ${submit.jobId} running…`
-        const final = await poll<{
-          status: string
-          videoUrl?: string
-          creditsRemaining?: number
-        }>({
-          fetch: () =>
-            ctx.client.json({
-              method: "GET",
-              path: `/studio/jobs/${submit.jobId}`,
-            }),
-          done: (s) => s.status === "succeeded" || s.status === "failed",
-          onTick: (s) => {
-            if (spinner) spinner.text = `Job ${submit.jobId} · ${s.status}`
-          },
+        if (spinner) spinner.text = "Rendering video…"
+        const final = await awaitJob(ctx.client, submit, "video", (s) => {
+          if (spinner) spinner.text = `Video · ${s.status}`
         })
-        if (final.status !== "succeeded" || !final.videoUrl) {
-          spinner?.fail("Video job failed.")
-          throw new Error(`Job ${submit.jobId} finished with status ${final.status}.`)
-        }
         spinner?.succeed("Video ready.")
-        if (opts.out) await downloadToFile(final.videoUrl, opts.out)
+        if (opts.out && final.videoUrl) await downloadToFile(final.videoUrl, opts.out)
         renderResult(ctx, final, `→ ${final.videoUrl}`)
       } catch (e) {
         spinner?.fail("Video generation failed.")
