@@ -1,10 +1,12 @@
 import type { Command } from "commander"
 import { password } from "@inquirer/prompts"
+import kleur from "kleur"
 import { writeFileConfig } from "../config.js"
 import { WmApiClient } from "../client.js"
 import { resolveConfig } from "../config.js"
 import { logger } from "../logger.js"
 import { WmCliError } from "../errors.js"
+import { DEFAULTS } from "../constants.js"
 
 export function registerLogin(program: Command): void {
   program
@@ -12,6 +14,12 @@ export function registerLogin(program: Command): void {
     .description("Save your WM Studio API key to ~/.wm/config.json (chmod 0600).")
     .option("--key <apiKey>", "Pass the API key non-interactively (useful in CI).")
     .action(async (opts: { key?: string }) => {
+      if (!opts.key) {
+        process.stderr.write(
+          `\n${kleur.bold("Get an API key:")} ${kleur.cyan(DEFAULTS.apiKeysUrl)}\n` +
+            kleur.dim("  Sign in → Dashboard → API keys → Create new key, then paste below.\n\n")
+        )
+      }
       const apiKey =
         opts.key ??
         (await password({

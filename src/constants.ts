@@ -6,10 +6,12 @@
 export const DEFAULTS = {
   /** Hosted WM Studio REST API base. Override via `WMSTUDIO_API_URL`. */
   apiUrl: "https://wmstudio.io/api",
-  /** Public upload endpoint surfaced when an asset URL is missing. */
-  uploadUrl: "https://director-cut.fly.dev/upload",
+  /** Page surfaced when the API requires a public asset URL. */
+  uploadUrl: "https://wmstudio.io/dashboard/uploads",
   /** Credit top-up landing page. */
   upgradeUrl: "https://wmstudio.io/dashboard/credits",
+  /** Where users create API keys. Shown by `wm login`. */
+  apiKeysUrl: "https://wmstudio.io/dashboard/api-keys",
   /** Below this remaining-credit count we surface a warning. */
   lowCreditsThreshold: 50,
   /** Default request timeout (ms) for non-job calls. */

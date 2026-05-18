@@ -1,6 +1,6 @@
 {
   "name": "wmstudio-cli",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Command-line client for the WM Studio creative platform. Generates images, videos, brand campaigns, and 3D assets from your terminal.",
   "type": "module",
   "bin": {
@@ -61,10 +61,9 @@
     "fal-ai",
     "creative-tools"
   ],
-  "homepage": "https://wmstudio.io",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/PrincipeRosso/wm-cli.git"
+  "homepage": "https://wmstudio.io/docs/cli",
+  "bugs": {
+    "url": "https://wmstudio.io/support"
   },
   "license": "MIT",
   "publishConfig": {

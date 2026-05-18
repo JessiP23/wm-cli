@@ -33,10 +33,18 @@ wm --version
 
 ## Authenticate
 
-Create an API key in your dashboard at <https://wmstudio.io/dashboard/api-keys>, then:
+**Step 1 — get an API key.** Sign in at <https://wmstudio.io>, then go to:
+
+> **Dashboard → API keys → Create new key**
+>
+> Direct link: <https://wmstudio.io/dashboard/api-keys>
+
+Copy the key once — it's shown only at creation. Keys start with `wm_live_…`.
+
+**Step 2 — log in from your terminal.**
 
 ```bash
-wm login                 # interactive — paste the key when prompted
+wm login                 # paste the key when prompted (input is masked)
 wm whoami                # prints account email + credit balance
 ```
 
@@ -132,7 +140,7 @@ rm -rf /tmp/wm-fresh
 - Docs: <https://wmstudio.io/docs/cli>
 - Dashboard: <https://wmstudio.io/dashboard>
 - API keys: <https://wmstudio.io/dashboard/api-keys>
-- Issues: <https://github.com/PrincipeRosso/wm-cli/issues>
+- Support: <https://wmstudio.io/support>
 
 ## License
 

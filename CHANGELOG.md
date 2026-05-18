@@ -1,5 +1,11 @@
 # @wmstudio/cli
 
+## 0.2.5
+
+### Patch Changes
+
+- Consolidate urls to wmstudio.io domain; show api key url in wm login
+
 ## 0.2.4
 
 ### Patch Changes
