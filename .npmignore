@@ -1,0 +1,25 @@
+# Belt-and-braces: the `files` field in package.json is the source of truth,
+# but anything listed here is also excluded from `npm pack` / `npm publish`.
+study.md
+RELEASING.md
+docs/
+test/
+src/
+.changeset/
+.github/
+.vscode/
+.idea/
+*.log
+.env
+.env.*
+coverage/
+node_modules/
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+eslint.config.js
+.editorconfig
+.prettierrc
+.prettierignore
+.nvmrc
+.npmrc
