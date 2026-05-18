@@ -1,5 +1,11 @@
 # @wmstudio/cli
 
+## 0.2.6
+
+### Patch Changes
+
+- Add wm search command
+
 ## 0.2.5
 
 ### Patch Changes
