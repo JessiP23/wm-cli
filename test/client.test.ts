@@ -19,13 +19,13 @@ const server = setupServer(
       plan: "pro",
     })
   }),
-  http.post(`${API}/studio/upscale-image`, async () => {
-    return HttpResponse.json(
+  http.post(`${API}/studio/upscale-image`, () =>
+    HttpResponse.json(
       { error: "Not enough credits", requiresTopUp: true, upgradeUrl: "https://wmstudio.io/billing" },
       { status: 402 }
     )
-  }),
-  http.post(`${API}/studio/generate-video`, async () =>
+  ),
+  http.post(`${API}/studio/generate-video`, () =>
     HttpResponse.json({ error: "boom" }, { status: 500 })
   )
 )

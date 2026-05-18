@@ -5,10 +5,9 @@
  * — keeping the contract identical means the CLI is a drop-in alternative
  * to the MCP for the same underlying backend.
  */
-import { request } from "undici"
 import { z } from "zod"
 import { DEFAULTS } from "./constants.js"
-import { WmCliError } from "./errors.js"
+import { ExitCode, WmCliError } from "./errors.js"
 import type { ResolvedConfig } from "./config.js"
 
 const ApiErrorSchema = z.object({
@@ -64,10 +63,12 @@ export class WmApiClient {
     }
 
     const ac = new AbortController()
-    const timeout = setTimeout(() => ac.abort(), req.timeoutMs ?? DEFAULTS.requestTimeoutMs)
+    const timeoutMs = req.timeoutMs ?? DEFAULTS.requestTimeoutMs
+    const timeout = setTimeout(() => ac.abort(), timeoutMs)
 
+    let res: Response
     try {
-      const res = await request(url, {
+      res = await fetch(url, {
         method: req.method,
         headers: {
           "content-type": "application/json",
@@ -78,17 +79,29 @@ export class WmApiClient {
         body: req.body ? JSON.stringify(req.body) : undefined,
         signal: ac.signal,
       })
-
-      const text = await res.body.text()
-      const parsed: unknown = text ? safeJson(text) : undefined
-
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        return parsed as T
-      }
-      throw classify(res.statusCode, parsed, this.cfg)
-    } finally {
+    } catch (err) {
       clearTimeout(timeout)
+      if (err instanceof WmCliError) throw err
+      const aborted = (err as { name?: string } | null)?.name === "AbortError"
+      throw new WmCliError({
+        code: aborted ? "timeout" : "network",
+        exitCode: aborted ? ExitCode.TIMEOUT : ExitCode.NETWORK,
+        message:
+          aborted
+            ? `Request timed out after ${timeoutMs}ms (${req.method} ${req.path})`
+            : `Network error: ${(err as Error).message}`,
+        details: { cause: (err as Error).message },
+      })
     }
+    clearTimeout(timeout)
+
+    const text = await res.text()
+    const parsed: unknown = text ? safeJson(text) : undefined
+
+    if (res.status >= 200 && res.status < 300) {
+      return parsed as T
+    }
+    throw classify(res.status, parsed, this.cfg)
   }
 }
 
