@@ -43,10 +43,7 @@ export function registerSearch(program: Command): void {
     .description("Search the web (Tavily-powered). Costs 1 credit (basic) or 2 (advanced).")
     .option("-n, --max <n>", "Max results to return (1–10)", "5")
     .option("-d, --depth <level>", "Search depth: basic | advanced", "basic")
-    .option(
-      "-t, --time <range>",
-      "Time filter: day | week | month | year (omit for all-time)"
-    )
+    .option("-t, --time <range>", "Time filter: day | week | month | year (omit for all-time)")
     .option(
       "--include-domain <domain>",
       "Restrict to this domain (repeatable)",
