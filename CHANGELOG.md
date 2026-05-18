@@ -1,5 +1,11 @@
 # @wmstudio/cli
 
+## 0.2.7
+
+### Patch Changes
+
+- fix wm --version always showing 0.0.0-dev
+
 ## 0.2.6
 
 ### Patch Changes
