@@ -1,5 +1,26 @@
 # @wmstudio/cli
 
+## 0.2.1
+
+### Patch Changes
+
+- Cli Wstudi
+
+## 0.2.0
+
+### Minor Changes
+
+- c72bec7: Initial scaffold. Not yet published.
+
+  Commands: `login`, `whoami`, `gen image`, `gen video`, `upscale`, `campaign`,
+  `jobs list`, `jobs get`. Auth via API key (file + env + flag). Hosted REST API
+  transport via `undici`. Structured logging with `WM_LOG_FORMAT=json` parity
+  with `mcp-director`.
+
+### Patch Changes
+
+- WmStudio CLI Tools - Image/video/image-to-image/image-to-video
+
 ## 0.1.0
 
 Initial scaffold. Not yet published.
